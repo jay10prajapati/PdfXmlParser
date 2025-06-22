@@ -1,0 +1,8 @@
+pypdf~=5.6.0
+PyPDF2~=3.0.1
+camelot-py~=1.0.0
+pikepdf~=9.9.0
+pandas~=2.2.2
+lxml~=5.2.1
+# The following are standard libraries and do not need to be listed:
+# os, sys, zipfile, pathlib, shutil, re, json, collections, typing, datetime, argparse, copy, etc.
