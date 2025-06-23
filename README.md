@@ -1,50 +1,48 @@
-# PDF Attachment Extractor
+# PDF & XBRL Data Pipeline
 
-A Python script to extract attachments from PDF files within zip archives while maintaining the original directory structure.
+This repository provides tools for extracting attachments from PDFs (including those inside ZIP archives), as well as a robust, automated pipeline for processing PDF, XML, and XBRL files.
 
 ## Features
 
-- Processes multiple zip files containing PDFs
-- Extracts attachments from PDF files
-- Maintains original directory structure in output
-- Handles both embedded files and annotation attachments
-- Skips numeric attachment IDs
-- Creates organized output structure
+- **Extracts attachments** from PDF files, including those inside ZIP archives.
+- **Maintains original directory structure** in output.
+- **Handles both embedded files and annotation attachments** in PDFs.
+- **Automated data pipeline** for sequential processing of PDF, XML, and XBRL files.
+- **Robust logging and error handling** throughout the pipeline.
 
 ## Requirements
 
 - Python 3.x
-- pypdf library
+- Install dependencies with:
+  ```bash
+  pip install -r requirements.txt
+  ```
 
 ## Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/pdf-attachment-extractor.git
-cd pdf-attachment-extractor
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/jay10prajapati/PdfXmlParser.git
+   cd PdfXmlParser
+   ```
 
-2. Install required packages:
-```bash
-pip install -r requirements.txt
-```
+2. **Install required packages:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Usage
 
-1. Create an `Input_data` folder in the project directory
-2. Place your zip files containing PDFs in the `Input_data` folder
-3. Run the script:
-```bash
-python main.py
-```
+### 1. PDF Attachment Extraction
 
-The script will:
-- Create an `Extracted_data` folder
-- Process each zip file in `Input_data`
-- Extract attachments from all PDFs
-- Maintain the original directory structure in `Extracted_data`
+1. Place your ZIP files containing PDFs in the `Input_data/` folder.
+2. Run the main extraction script:
+   ```bash
+   python main.py
+   ```
+   - This will create an `Extracted_data/` folder and extract all attachments from PDFs, preserving the original directory structure.
 
-## Output Structure
+#### Output Structure Example
 
 ```
 Input_data/
@@ -75,43 +73,49 @@ Extracted_data/
             [extracted attachments]
 ```
 
-## License
+### 2. Data Pipeline Script: `run_data_pipeline.py`
 
-MIT License
+This script automates the end-to-end data extraction and processing pipeline for PDF, XML, and XBRL files. **Run this from the project root.**
 
-## Data Pipeline Script: `run_data_pipeline.py`
+#### What It Does
 
-This script automates the end-to-end data extraction and processing pipeline for PDF, XML, and XBRL files. It is designed to be run from the project root and uses the system Python interpreter.
-
-### What It Does
-1. **Extracts XBRL attachments** from PDFs using `extract_xbrl_attachments.py`.
-2. **Identifies and separates** XBRL and non-XBRL files using `get_xbrl_and_non_xbrl_files.py`.
-3. **Waits for required files** to appear in `No_XBRL/` and `XBRL_XML/` directories.
-4. **Processes files**:
+1. **Stage 1: Extraction**
+   - Runs `get_xbrl_and_non_xbrl_files.py` to identify and separate XBRL and non-XBRL files.
+   - Then runs `extract_xbrl_attachments.py` to extract XBRL attachments from PDFs.
+2. **Stage 2: File Check**
+   - Waits for required files to appear in `No_XBRL/` and `XBRL_XML/` directories.
+3. **Stage 3: Processing**
    - Maps tables from non-XBRL PDFs (`pdf_table_extractor/pdf_no_xbrl_table_mapper.py`).
    - Converts XBRL XML files to JSON (`xbrl_xml_extractor/xbrl_xml_to_json_batch.py`).
    - Converts XBRL JSON files to tables (`xbrl_xml_extractor/xbrl_json_to_table_batch.py`).
 
-### Logging & Error Handling
+#### Logging & Error Handling
+
 - All actions and outputs are logged to both the console and `pipeline.log`.
 - Errors are highlighted in bold red in the console and clearly marked in the log file.
 - The pipeline continues execution even if a step fails, but errors are highly visible.
 
-### Usage
-From the project root, run:
+#### Usage
 
+From the project root, run:
 ```bash
 python run_data_pipeline.py
 ```
 
-### Customization
-- The script uses the system Python. To use a virtual environment, modify the script to activate your environment before running.
+#### Customization
+
+- The script uses the system Python. To use a virtual environment, activate it before running the script.
 - Timeout and polling intervals for file checks can be adjusted in the script.
 
-### Best Practices Followed
+#### Best Practices Followed
+
 - Robust logging with timestamps and error highlighting.
 - Sequential, dependency-aware execution.
 - Graceful error handling and continuation.
 - Clear documentation and maintainable code structure.
 
-See the top of `run_data_pipeline.py` for further inline documentation. 
+See the top of `run_data_pipeline.py` for further inline documentation.
+
+## License
+
+MIT License 
