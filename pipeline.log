@@ -1,0 +1,28 @@
+2025-06-23 22:29:32,891 [INFO] Starting: Extract XBRL attachments from PDFs (extract_xbrl_attachments.py)
+2025-06-23 22:29:35,167 [INFO] Completed: Extract XBRL attachments from PDFs
+Output:
+
+2025-06-23 22:29:35,167 [INFO] Starting: Identify and separate XBRL and non-XBRL files (get_xbrl_and_non_xbrl_files.py)
+2025-06-23 22:29:36,960 [INFO] Completed: Identify and separate XBRL and non-XBRL files
+Output:
+
+2025-06-23 22:29:36,960 [INFO] Waiting for at least 1 file(s) in No_XBRL (timeout: 300s)...
+2025-06-23 22:29:36,961 [INFO] Found 7 file(s) in No_XBRL.
+2025-06-23 22:29:36,961 [INFO] Waiting for at least 1 file(s) in XBRL_XML (timeout: 300s)...
+2025-06-23 22:38:24,615 [INFO] Starting: Identify and separate XBRL and non-XBRL files (get_xbrl_and_non_xbrl_files.py)
+2025-06-23 22:38:26,307 [INFO] Completed: Identify and separate XBRL and non-XBRL files
+Output:
+
+2025-06-23 22:38:26,308 [INFO] Starting: Extract XBRL attachments from PDFs (extract_xbrl_attachments.py)
+2025-06-23 22:38:38,665 [INFO] Completed: Extract XBRL attachments from PDFs
+Output:
+
+2025-06-23 22:38:38,665 [INFO] Waiting for at least 1 file(s) in No_XBRL (timeout: 300s)...
+2025-06-23 22:38:38,668 [INFO] Found 14 file(s) in No_XBRL.
+2025-06-23 22:38:38,668 [INFO] Waiting for at least 1 file(s) in XBRL_XML (timeout: 300s)...
+2025-06-23 22:38:38,691 [INFO] Found 76 file(s) in XBRL_XML.
+2025-06-23 22:38:38,692 [INFO] Starting: Map tables from non-XBRL PDFs (pdf_table_extractor\pdf_no_xbrl_table_mapper.py)
+2025-06-23 22:41:10,607 [INFO] Completed: Map tables from non-XBRL PDFs
+Output:
+
+2025-06-23 22:41:10,608 [INFO] Starting: Convert XBRL XML files to JSON (xbrl_xml_extractor\xbrl_xml_to_json_batch.py)
