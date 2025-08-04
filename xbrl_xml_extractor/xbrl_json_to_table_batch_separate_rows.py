@@ -1,18 +1,19 @@
 """
-xbrl_json_to_table_batch.py
+xbrl_json_to_table_batch_separate_rows.py
 
 This script 
     - batch-processes all JSON files in the XBRL_XML_JSON directory, 
-    - extracts tabular data with comprehensive field extraction including multiple scenarios,
+    - extracts tabular data with each scenario as a separate row,
     - and saves it as CSV files in the XBRL_XML_JSON_TABLE directory. 
 It also creates filtered CSVs for specific element names. 
 The script logs its progress and errors for easier debugging and traceability.
 
 Key Features:
-    - Handles multiple scenario dimensions per element (concatenated with " | " delimiter)
+    - Creates separate rows for each scenario dimension (normalized table structure)
     - Extracts comprehensive entity, period, and namespace information
     - Creates both full and filtered CSV files
     - Robust error handling and logging
+    - Filename sanitization for Windows compatibility
 """
 
 import pandas as pd
@@ -165,8 +166,8 @@ for json_file in json_files:
     base_filename = os.path.splitext(json_file)[0]
     sanitized_base = sanitize_filename(base_filename)
     
-    csv_file = sanitized_base + '.csv'
-    filtered_csv_file = sanitized_base + '_filtered.csv'
+    csv_file = sanitized_base + '_separate_rows.csv'
+    filtered_csv_file = sanitized_base + '_separate_rows_filtered.csv'
     
     csv_path = os.path.join(csv_folder, csv_file)
     filtered_csv_path = os.path.join(csv_folder, filtered_csv_file)
@@ -184,6 +185,7 @@ for json_file in json_files:
         extracted_data = []
         total_scenarios = 0
         elements_with_multiple_scenarios = 0
+        total_rows_created = 0
 
         # Iterate through each item in the JSON data
         for item in json_data:
@@ -207,60 +209,72 @@ for json_file in json_files:
             # Combine startDate and instant into a single column, prioritizing instant if period type is 'instant'
             start_or_instant_date = instant_date if period_type == "instant" else start_date
 
-            # Scenario extraction (all scenarios if present)
-            scenario_list = context_details.get("scenario", [])
-            if scenario_list and isinstance(scenario_list, list):
-                # Extract all scenarios and concatenate with delimiter
-                scenario_types = []
-                scenario_dimensions = []
-                scenario_values = []
-                
-                for scenario in scenario_list:
-                    scenario_types.append(scenario.get("type", ""))
-                    scenario_dimensions.append(scenario.get("dimension", ""))
-                    scenario_values.append(scenario.get("value", ""))
-                
-                # Join multiple scenarios with " | " delimiter
-                scenario_type = " | ".join(scenario_types) if scenario_types else ""
-                scenario_dimension = " | ".join(scenario_dimensions) if scenario_dimensions else ""
-                scenario_value = " | ".join(scenario_values) if scenario_values else ""
-                scenario_count = len(scenario_list)
-                
-                # Update statistics
-                total_scenarios += scenario_count
-                if scenario_count > 1:
-                    elements_with_multiple_scenarios += 1
-            else:
-                scenario_type = ""
-                scenario_dimension = ""
-                scenario_value = ""
-                scenario_count = 0
-
             # Entity information extraction
             entity_details = context_details.get("entity", {})
             entity_scheme = entity_details.get("scheme", "")
             entity_value = entity_details.get("value", "")
+
+            # Scenario extraction - CREATE SEPARATE ROWS FOR EACH SCENARIO
+            scenario_list = context_details.get("scenario", [])
             
-            # Create a dictionary for the current row with desired columns
-            row_data = {
-                "ElementName": element_name,
-                "NamespacePrefix": namespace_prefix,
-                "NamespaceURI": namespace_uri,
-                "Value": value,
-                "UnitRef": unit_ref,
-                "Decimals": decimals,
-                "PeriodType": period_type,
-                "StartDate_Instant": start_or_instant_date,
-                "EndDate": end_date,
-                "ContextRef": context_ref,
-                "EntityScheme": entity_scheme,
-                "EntityValue": entity_value,
-                "ScenarioCount": scenario_count,
-                "ScenarioTypes": scenario_type,
-                "ScenarioDimensions": scenario_dimension,
-                "ScenarioValues": scenario_value
-            }
-            extracted_data.append(row_data)
+            if scenario_list and isinstance(scenario_list, list):
+                # Create a separate row for each scenario
+                scenario_count = len(scenario_list)
+                total_scenarios += scenario_count
+                
+                if scenario_count > 1:
+                    elements_with_multiple_scenarios += 1
+                
+                for scenario_index, scenario in enumerate(scenario_list):
+                    scenario_type = scenario.get("type", "")
+                    scenario_dimension = scenario.get("dimension", "")
+                    scenario_value = scenario.get("value", "")
+                    
+                    # Create a dictionary for the current row with desired columns
+                    row_data = {
+                        "ElementName": element_name,
+                        "NamespacePrefix": namespace_prefix,
+                        "NamespaceURI": namespace_uri,
+                        "Value": value,
+                        "UnitRef": unit_ref,
+                        "Decimals": decimals,
+                        "PeriodType": period_type,
+                        "StartDate_Instant": start_or_instant_date,
+                        "EndDate": end_date,
+                        "ContextRef": context_ref,
+                        "EntityScheme": entity_scheme,
+                        "EntityValue": entity_value,
+                        "ScenarioIndex": scenario_index + 1,  # 1-based index
+                        "ScenarioType": scenario_type,
+                        "ScenarioDimension": scenario_dimension,
+                        "ScenarioValue": scenario_value,
+                        "TotalScenariosForElement": scenario_count
+                    }
+                    extracted_data.append(row_data)
+                    total_rows_created += 1
+            else:
+                # No scenarios - create one row with empty scenario fields
+                row_data = {
+                    "ElementName": element_name,
+                    "NamespacePrefix": namespace_prefix,
+                    "NamespaceURI": namespace_uri,
+                    "Value": value,
+                    "UnitRef": unit_ref,
+                    "Decimals": decimals,
+                    "PeriodType": period_type,
+                    "StartDate_Instant": start_or_instant_date,
+                    "EndDate": end_date,
+                    "ContextRef": context_ref,
+                    "EntityScheme": entity_scheme,
+                    "EntityValue": entity_value,
+                    "ScenarioIndex": 0,  # 0 indicates no scenarios
+                    "ScenarioType": "",
+                    "ScenarioDimension": "",
+                    "ScenarioValue": "",
+                    "TotalScenariosForElement": 0
+                }
+                extracted_data.append(row_data)
+                total_rows_created += 1
 
         # Create the Pandas DataFrame from the extracted data
         df = pd.DataFrame(extracted_data)
@@ -268,6 +282,7 @@ for json_file in json_files:
         # Log processing statistics
         logging.info(f"Processed {len(json_data)} elements with {total_scenarios} total scenarios")
         logging.info(f"Elements with multiple scenarios: {elements_with_multiple_scenarios}")
+        logging.info(f"Total rows created: {total_rows_created}")
 
         # Save the DataFrame as CSV with error handling
         if safe_file_write(df, csv_path):
@@ -284,10 +299,19 @@ for json_file in json_files:
             logging.error(f"Failed to save filtered CSV to {filtered_csv_path}")
         
         # Log some sample scenario information if available
-        multi_scenario_elements = df[df['ScenarioCount'] > 1]
+        multi_scenario_elements = df[df['TotalScenariosForElement'] > 1]
         if not multi_scenario_elements.empty:
             sample_element = multi_scenario_elements.iloc[0]
             logging.info(f"Sample multi-scenario element: {sample_element['ElementName']} "
-                        f"with {sample_element['ScenarioCount']} scenarios")
+                        f"with {sample_element['TotalScenariosForElement']} scenarios (showing scenario {sample_element['ScenarioIndex']})")
+            
+        # Show data expansion summary
+        original_elements = len(json_data)
+        final_rows = len(df)
+        expansion_ratio = final_rows / original_elements if original_elements > 0 else 0
+        logging.info(f"Data expansion: {original_elements} elements -> {final_rows} rows (ratio: {expansion_ratio:.2f})")
+        
     except Exception as e:
         logging.error(f"Failed to process {json_file}: {e}")
+
+logging.info("Batch conversion completed!")
