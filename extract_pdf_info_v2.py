@@ -282,8 +282,14 @@ def extract_aoc4_info(form_fields: Dict[str, str]) -> Dict[str, str]:
     """
     aoc4_info = {}
     
-    # Company basic information
+    # Company basic information from Part A
     aoc4_info['CIN'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].CIN_C[0]', '')
+    aoc4_info['GLN'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].GLN_C[0]', '')
+    aoc4_info['Company_Name'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].CompName_C[0]', '')
+    aoc4_info['Company_Address'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].CompanyAddress_C[0]', '')
+    aoc4_info['Company_Email'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].CompEmail_C[0]', '')
+    
+    # Financial year dates
     aoc4_info['From_Date'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].FromDate[0]', '')
     aoc4_info['To_Date'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].ToDate[0]', '')
     
@@ -292,6 +298,39 @@ def extract_aoc4_info(form_fields: Dict[str, str]) -> Dict[str, str]:
         aoc4_info['Financial_Year'] = f"{aoc4_info['From_Date']} to {aoc4_info['To_Date']}"
     else:
         aoc4_info['Financial_Year'] = ''
+    
+    # Meeting information
+    aoc4_info['Meeting_Date'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].MeetingDate_D[0]', '')
+    
+    # Company historical information
+    aoc4_info['Date_Of_Incorporation'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_IncDate[0]', '')
+    aoc4_info['State'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_State[0]', '')
+    aoc4_info['Company_Type'] = decode_form_values(form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_OPC[0]', ''), 'type')
+    aoc4_info['Company_Status'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_SCmpny[0]', '')
+    aoc4_info['Number_Of_Members'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_NMEM[0]', '')
+    aoc4_info['Authorized_Capital'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_ACAP[0]', '')
+    aoc4_info['Company_Name_Historical'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_COMN[0]', '')
+    
+    # Additional historical information
+    aoc4_info['Update_Info'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_UPDATE[0]', '')
+    aoc4_info['Filing_Status'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_4B1[0]', '')
+    aoc4_info['Company_Email_Historical'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].hiCompEmail_C[0]', '')
+    aoc4_info['Last_Filing_Date'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_7B[0]', '')
+    
+    # Additional status fields
+    aoc4_info['Status_Field_1'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_4B2[0]', '')
+    aoc4_info['Status_Field_2'] = decode_form_values(form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_4B3[0]', ''), 'yes_no')
+    aoc4_info['Status_Field_3'] = decode_form_values(form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_4B4[0]', ''), 'yes_no')
+    aoc4_info['Status_Field_4'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_4B5[0]', '')
+    aoc4_info['Status_Field_5'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_4B6[0]', '')
+    aoc4_info['Status_Field_6'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_4B7[0]', '')
+    aoc4_info['Status_Field_7'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_4B8[0]', '')
+    
+    # Presence number and prefill information
+    aoc4_info['Presence_Number'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Pres_Num[0]', '')
+    aoc4_info['Prefill_Button'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Prefill_B[0]', '')
+    aoc4_info['CIN_Status'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].CINStatus_N[0]', '')
+    aoc4_info['Denomination'] = form_fields.get('data[0].FormAOC4_Dtls[0].Segment1_PartA[0].Hi_demon[0]', '')
     
     return aoc4_info
 
@@ -1268,11 +1307,305 @@ def process_all_mgt7_to_json_csv(input_dir: str = "No_XBRL", output_json_dir: st
 
 def print_aoc4_info(extracted_info: Dict[str, str]):
     """Print AOC4 form information in a formatted way."""
-    print("\n=== AOC4 FORM - FINANCIAL INFORMATION ===")
-    print(f"CIN: {extracted_info.get('CIN', 'Not found')}")
+    print("\n=== AOC4 FORM - ANNUAL RETURN INFORMATION ===")
+    
+    # Company basic information
+    print(f"(1)(a) Corporate Identity Number (CIN): {extracted_info.get('CIN', 'Not found')}")
+    print(f"(1)(b) Global Location Number (GLN): {extracted_info.get('GLN', 'Not found')}")
+    print(f"(2)(a) Name of the company: {extracted_info.get('Company_Name', 'Not found')}")
+    
+    # Company address
+    print(f"(2)(b) Address of the registered office of the company:")
+    address = extracted_info.get('Company_Address', 'Not found')
+    if address != 'Not found' and address:
+        # Format address for better readability
+        formatted_address = address.replace('\r', '\n        ')
+        print(f"        {formatted_address}")
+    else:
+        print(f"        {address}")
+    
+    print(f"(2)(c) e-mail ID of the company: {extracted_info.get('Company_Email', 'Not found')}")
+    
+    # Financial year information
+    print(f"\n=== FINANCIAL YEAR INFORMATION ===")
+    print(f"Financial year to which financial statements relates:")
+    print(f"From: {extracted_info.get('From_Date', 'Not found')} (DD/MM/YYYY)")
+    print(f"To: {extracted_info.get('To_Date', 'Not found')} (DD/MM/YYYY)")
     print(f"Financial Year: {extracted_info.get('Financial_Year', 'Not found')}")
-    print(f"From Date: {extracted_info.get('From_Date', 'Not found')}")
-    print(f"To Date: {extracted_info.get('To_Date', 'Not found')}")
+    print(f"Meeting Date: {extracted_info.get('Meeting_Date', 'Not found')}")
+    
+    # Company classification and historical information
+    print(f"\n=== COMPANY CLASSIFICATION ===")
+    print(f"Date of Incorporation: {extracted_info.get('Date_Of_Incorporation', 'Not found')}")
+    print(f"State: {extracted_info.get('State', 'Not found')}")
+    print(f"Company Type: {extracted_info.get('Company_Type', 'Not found')}")
+    print(f"Company Status: {extracted_info.get('Company_Status', 'Not found')}")
+    print(f"Number of Members: {extracted_info.get('Number_Of_Members', 'Not found')}")
+    print(f"Authorized Capital: Rs. {extracted_info.get('Authorized_Capital', 'Not found')}")
+    
+    # Historical information
+    if extracted_info.get('Company_Name_Historical') and extracted_info.get('Company_Name_Historical') != extracted_info.get('Company_Name'):
+        print(f"Historical Company Name: {extracted_info.get('Company_Name_Historical', 'Not found')}")
+    
+    if extracted_info.get('Company_Email_Historical') and extracted_info.get('Company_Email_Historical') != extracted_info.get('Company_Email'):
+        print(f"Historical Email: {extracted_info.get('Company_Email_Historical', 'Not found')}")
+    
+    # Filing information
+    print(f"\n=== FILING INFORMATION ===")
+    print(f"Filing Status: {extracted_info.get('Filing_Status', 'Not found')}")
+    print(f"Last Filing Date: {extracted_info.get('Last_Filing_Date', 'Not found')}")
+    print(f"Update Info: {extracted_info.get('Update_Info', 'Not found')}")
+    
+    # Status fields (if relevant)
+    status_fields = [
+        ('Status Field 2', extracted_info.get('Status_Field_2', '')),
+        ('Status Field 3', extracted_info.get('Status_Field_3', '')),
+    ]
+    
+    relevant_status = [(name, value) for name, value in status_fields if value and value != 'Not found']
+    if relevant_status:
+        print(f"\n=== ADDITIONAL STATUS INFORMATION ===")
+        for name, value in relevant_status:
+            print(f"{name}: {value}")
+
+
+def transform_aoc4_to_json(extracted_info: Dict[str, str], pdf_filename: str = "") -> Dict[str, Any]:
+    """
+    Transform AOC4 extracted information into a structured JSON format.
+    
+    Args:
+        extracted_info: Dictionary containing extracted AOC4 information
+        pdf_filename: Name of the source PDF file (optional)
+        
+    Returns:
+        Dictionary in JSON-ready format
+    """
+    
+    # Create the main JSON structure
+    aoc4_json = {
+        # File metadata
+        "source_file": pdf_filename,
+        "form_type": "AOC4",
+        "extraction_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        
+        # Basic company information
+        "company_cin": extracted_info.get('CIN', ''),
+        "company_gln": extracted_info.get('GLN', ''),
+        "company_name": extracted_info.get('Company_Name', ''),
+        "company_email": extracted_info.get('Company_Email', ''),
+        "company_address": _clean_address(extracted_info.get('Company_Address', '')),
+        
+        # Financial year information
+        "financial_year_from": extracted_info.get('From_Date', ''),
+        "financial_year_to": extracted_info.get('To_Date', ''),
+        "financial_year": extracted_info.get('Financial_Year', ''),
+        "meeting_date": extracted_info.get('Meeting_Date', ''),
+        
+        # Company classification
+        "date_of_incorporation": extracted_info.get('Date_Of_Incorporation', ''),
+        "state": extracted_info.get('State', ''),
+        "company_type": extracted_info.get('Company_Type', ''),
+        "company_status": extracted_info.get('Company_Status', ''),
+        "number_of_members": _safe_int_convert(extracted_info.get('Number_Of_Members', '')),
+        "authorized_capital": _safe_float_convert(extracted_info.get('Authorized_Capital', '')),
+        
+        # Historical information
+        "company_name_historical": extracted_info.get('Company_Name_Historical', ''),
+        "company_email_historical": extracted_info.get('Company_Email_Historical', ''),
+        "update_info": extracted_info.get('Update_Info', ''),
+        
+        # Filing information
+        "filing_status": extracted_info.get('Filing_Status', ''),
+        "last_filing_date": extracted_info.get('Last_Filing_Date', ''),
+        "presence_number": extracted_info.get('Presence_Number', ''),
+        "cin_status": extracted_info.get('CIN_Status', ''),
+        "denomination": extracted_info.get('Denomination', ''),
+        
+        # Additional status fields
+        "status_field_1": extracted_info.get('Status_Field_1', ''),
+        "status_field_2": extracted_info.get('Status_Field_2', ''),
+        "status_field_3": extracted_info.get('Status_Field_3', ''),
+        "status_field_4": extracted_info.get('Status_Field_4', ''),
+        "status_field_5": extracted_info.get('Status_Field_5', ''),
+        "status_field_6": extracted_info.get('Status_Field_6', ''),
+        "status_field_7": extracted_info.get('Status_Field_7', ''),
+        
+        # Technical fields
+        "prefill_button": extracted_info.get('Prefill_Button', '')
+    }
+    
+    return aoc4_json
+
+
+def save_aoc4_json(aoc4_json: Dict[str, Any], output_file: str) -> bool:
+    """
+    Save AOC4 JSON data to a file.
+    
+    Args:
+        aoc4_json: AOC4 data in JSON format
+        output_file: Path to output JSON file
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(aoc4_json, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as e:
+        print(f"Error saving JSON file {output_file}: {e}")
+        return False
+
+
+def aoc4_json_to_csv_rows(aoc4_json: Dict[str, Any]) -> List[Dict[str, str]]:
+    """
+    Convert AOC4 JSON to a list of flat dictionaries suitable for CSV export.
+    
+    Args:
+        aoc4_json: AOC4 data in JSON format
+        
+    Returns:
+        List of dictionaries, each representing a CSV row
+    """
+    csv_rows = []
+    
+    # Create a single row with all company information
+    row = {
+        "source_file": aoc4_json.get("source_file", ""),
+        "form_type": aoc4_json.get("form_type", ""),
+        "extraction_timestamp": aoc4_json.get("extraction_timestamp", ""),
+        "company_cin": aoc4_json.get("company_cin", ""),
+        "company_gln": aoc4_json.get("company_gln", ""),
+        "company_name": aoc4_json.get("company_name", ""),
+        "company_email": aoc4_json.get("company_email", ""),
+        "company_address": aoc4_json.get("company_address", ""),
+        "financial_year_from": aoc4_json.get("financial_year_from", ""),
+        "financial_year_to": aoc4_json.get("financial_year_to", ""),
+        "financial_year": aoc4_json.get("financial_year", ""),
+        "meeting_date": aoc4_json.get("meeting_date", ""),
+        "date_of_incorporation": aoc4_json.get("date_of_incorporation", ""),
+        "state": aoc4_json.get("state", ""),
+        "company_type": aoc4_json.get("company_type", ""),
+        "company_status": aoc4_json.get("company_status", ""),
+        "number_of_members": str(aoc4_json.get("number_of_members", 0)),
+        "authorized_capital": str(aoc4_json.get("authorized_capital", 0.0)),
+        "company_name_historical": aoc4_json.get("company_name_historical", ""),
+        "company_email_historical": aoc4_json.get("company_email_historical", ""),
+        "update_info": aoc4_json.get("update_info", ""),
+        "filing_status": aoc4_json.get("filing_status", ""),
+        "last_filing_date": aoc4_json.get("last_filing_date", ""),
+        "presence_number": aoc4_json.get("presence_number", ""),
+        "cin_status": aoc4_json.get("cin_status", ""),
+        "denomination": aoc4_json.get("denomination", ""),
+        "status_field_1": aoc4_json.get("status_field_1", ""),
+        "status_field_2": aoc4_json.get("status_field_2", ""),
+        "status_field_3": aoc4_json.get("status_field_3", ""),
+        "status_field_4": aoc4_json.get("status_field_4", ""),
+        "status_field_5": aoc4_json.get("status_field_5", ""),
+        "status_field_6": aoc4_json.get("status_field_6", ""),
+        "status_field_7": aoc4_json.get("status_field_7", ""),
+        "prefill_button": aoc4_json.get("prefill_button", "")
+    }
+    
+    csv_rows.append(row)
+    return csv_rows
+
+
+def process_all_aoc4_to_json_csv(input_dir: str = "No_XBRL", output_json_dir: str = "No_XBRL_JSON", output_csv_file: str = "aoc4_combined_data.csv") -> Dict[str, int]:
+    """
+    Process all AOC4 PDFs and export to JSON and CSV formats.
+    
+    Args:
+        input_dir: Directory containing PDF files
+        output_json_dir: Directory to save individual JSON files
+        output_csv_file: Path for combined CSV file
+        
+    Returns:
+        Dictionary with processing statistics
+    """
+    
+    stats = {
+        "total_files": 0,
+        "aoc4_files": 0,
+        "json_saved": 0,
+        "csv_rows": 0,
+        "errors": 0
+    }
+    
+    # Create output directories
+    os.makedirs(output_json_dir, exist_ok=True)
+    
+    # Check if input directory exists
+    if not os.path.exists(input_dir):
+        print(f"Error: Directory '{input_dir}' does not exist")
+        return stats
+    
+    # Get all PDF files
+    pdf_files = [f for f in os.listdir(input_dir) if f.lower().endswith('.pdf')]
+    stats["total_files"] = len(pdf_files)
+    
+    if not pdf_files:
+        print(f"No PDF files found in {input_dir}")
+        return stats
+    
+    print(f"Processing {len(pdf_files)} PDF files for AOC4 JSON/CSV export...")
+    
+    all_csv_rows = []
+    
+    # Process each PDF file
+    for pdf_file in pdf_files:
+        try:
+            pdf_path = os.path.join(input_dir, pdf_file)
+            cin, financial_year, extracted_info, form_type = process_pdf(pdf_path)
+            
+            if form_type == 'AOC4' and extracted_info:
+                stats["aoc4_files"] += 1
+                
+                # Transform to JSON
+                aoc4_json = transform_aoc4_to_json(extracted_info, pdf_file)
+                
+                # Save individual JSON file
+                json_filename = pdf_file.replace('.pdf', '_aoc4.json')
+                json_path = os.path.join(output_json_dir, json_filename)
+                
+                if save_aoc4_json(aoc4_json, json_path):
+                    stats["json_saved"] += 1
+                    print(f"✓ JSON saved: {json_filename}")
+                else:
+                    stats["errors"] += 1
+                    print(f"✗ Failed to save JSON: {json_filename}")
+                
+                # Convert to CSV rows
+                csv_rows = aoc4_json_to_csv_rows(aoc4_json)
+                all_csv_rows.extend(csv_rows)
+                stats["csv_rows"] += len(csv_rows)
+                
+        except Exception as e:
+            stats["errors"] += 1
+            print(f"✗ Error processing {pdf_file}: {e}")
+    
+    # Save combined CSV file
+    if all_csv_rows:
+        try:
+            with open(output_csv_file, 'w', newline='', encoding='utf-8') as csvfile:
+                fieldnames = all_csv_rows[0].keys()
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(all_csv_rows)
+            print(f"✓ Combined CSV saved: {output_csv_file} ({len(all_csv_rows)} rows)")
+        except Exception as e:
+            stats["errors"] += 1
+            print(f"✗ Failed to save CSV: {e}")
+    
+    # Print summary
+    print("\n=== AOC4 PROCESSING SUMMARY ===")
+    print(f"Total PDF files processed: {stats['total_files']}")
+    print(f"AOC4 files found: {stats['aoc4_files']}")
+    print(f"JSON files saved: {stats['json_saved']}")
+    print(f"CSV rows generated: {stats['csv_rows']}")
+    print(f"Errors encountered: {stats['errors']}")
+    
+    return stats
 
 
 def print_pac_info(extracted_info: Dict[str, str]):
@@ -1394,17 +1727,18 @@ def main():
     print("1. Display mode: Show detailed information for each PDF")
     print("2. Export mode: Export all MGT7 data to JSON and CSV")
     print("3. Export mode: Export all PAC data to JSON and CSV")
-    print("4. Both modes: Display and export")
+    print("4. Export mode: Export all AOC4 data to JSON and CSV")
+    print("5. Export mode: Export all form types (MGT7, PAC, AOC4) to JSON and CSV")
     
     while True:
-        choice = input("\nSelect mode (1, 2, 3, 4, or 'q' to quit): ").strip()
+        choice = input("\nSelect mode (1, 2, 3, 4, 5, or 'q' to quit): ").strip()
         
         if choice.lower() == 'q':
             return
-        elif choice in ['1', '2', '3', '4']:
+        elif choice in ['1', '2', '3', '4', '5']:
             break
         else:
-            print("Invalid choice. Please enter 1, 2, 3, 4, or 'q'.")
+            print("Invalid choice. Please enter 1, 2, 3, 4, 5, or 'q'.")
     
     # Directory containing No-XBRL PDFs
     input_dir = "No_XBRL"
@@ -1436,10 +1770,18 @@ def main():
         stats = process_all_pac_to_json_csv()
         return
     
-    # Both modes (option 4) - process both MGT7 and PAC
+    # Export mode for AOC4 (option 4)
     elif choice == '4':
         print("\n" + "="*60)
-        print("EXPORT MODE: Processing all MGT7 and PAC files for JSON/CSV export")
+        print("EXPORT MODE: Processing all AOC4 files for JSON/CSV export")
+        print("="*60)
+        stats = process_all_aoc4_to_json_csv()
+        return
+    
+    # All export modes (option 5) - process MGT7, PAC, and AOC4
+    elif choice == '5':
+        print("\n" + "="*60)
+        print("EXPORT MODE: Processing all MGT7, PAC, and AOC4 files for JSON/CSV export")
         print("="*60)
         
         print("Processing MGT7 files...")
@@ -1448,11 +1790,15 @@ def main():
         print("\nProcessing PAC files...")
         pac_stats = process_all_pac_to_json_csv()
         
+        print("\nProcessing AOC4 files...")
+        aoc4_stats = process_all_aoc4_to_json_csv()
+        
         print("\n=== COMBINED PROCESSING SUMMARY ===")
         print(f"MGT7 files processed: {mgt7_stats['mgt7_files']}")
         print(f"PAC files processed: {pac_stats['pac_files']}")
-        print(f"Total JSON files saved: {mgt7_stats['json_saved'] + pac_stats['json_saved']}")
-        print(f"Total errors: {mgt7_stats['errors'] + pac_stats['errors']}")
+        print(f"AOC4 files processed: {aoc4_stats['aoc4_files']}")
+        print(f"Total JSON files saved: {mgt7_stats['json_saved'] + pac_stats['json_saved'] + aoc4_stats['json_saved']}")
+        print(f"Total errors: {mgt7_stats['errors'] + pac_stats['errors'] + aoc4_stats['errors']}")
         return
     
     # Display mode (option 1)
@@ -1498,6 +1844,22 @@ def main():
                 
             elif form_type == 'AOC4' and extracted_info:
                 print_aoc4_info(extracted_info)
+                
+                # Show a sample of the JSON structure for AOC4
+                aoc4_json = transform_aoc4_to_json(extracted_info, pdf_file)
+                print("\n=== JSON TRANSFORMATION SAMPLE ===")
+                print("Company Information:")
+                print(f"  CIN: {aoc4_json['company_cin']}")
+                print(f"  Name: {aoc4_json['company_name']}")
+                print(f"  Type: {aoc4_json['company_type']}")
+                print(f"  Financial Year: {aoc4_json['financial_year']}")
+                print(f"  State: {aoc4_json['state']}")
+                print(f"  Authorized Capital: Rs. {aoc4_json['authorized_capital']}")
+                
+                # Demonstrate CSV-ready format
+                csv_rows = aoc4_json_to_csv_rows(aoc4_json)
+                print(f"\nCSV Format: Ready for export with {len(csv_rows)} rows")
+                
             elif form_type == 'PAC' and extracted_info:
                 print_pac_info(extracted_info)
                 
